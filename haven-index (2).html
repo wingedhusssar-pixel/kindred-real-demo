@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Haven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..700,50&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF6ED;
+  --card:#FFFDF8;
+  --berry:#8E3A5F;
+  --berry-deep:#6E2A49;
+  --berry-tint:#F3E3EA;
+  --sage:#6F8F7C;
+  --sage-deep:#4E6E5C;
+  --sage-tint:#E3ECE5;
+  --gold:#D9A441;
+  --gold-tint:#F6EBD3;
+  --ink:#332735;
+  --ink-soft:#6E6272;
+  --line:#EAE1D2;
+  --flag:#B4472E;
+  --flag-tint:#F9E7E1;
+  --radius:18px;
+  --shadow:0 2px 10px rgba(51,39,53,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:#EFE7D9;color:var(--ink);display:flex;align-items:center;justify-content:center}
+.phone{width:100%;max-width:430px;height:100dvh;max-height:930px;background:var(--cream);display:flex;flex-direction:column;position:relative;overflow:hidden}
+@media(min-width:500px){.phone{border-radius:36px;box-shadow:0 24px 70px rgba(51,39,53,.28);height:88dvh}}
+h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;font-weight:600}
+button{font-family:inherit;border:none;cursor:pointer;background:none;color:inherit}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:8px}
+input,textarea{font-family:inherit;color:var(--ink)}
+
+.top{padding:20px 22px 12px;display:flex;align-items:center;justify-content:space-between}
+.wordmark{font-family:'Fraunces',serif;font-weight:600;font-size:24px;color:var(--berry);letter-spacing:-.01em}
+.wordmark .dot{color:var(--gold)}
+.top-sub{font-size:13px;color:var(--ink-soft);padding:0 22px 4px}
+
+.screen{display:none;flex:1;overflow-y:auto;padding-bottom:96px;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.active{display:block}
+
+.tabbar{position:absolute;bottom:0;left:0;right:0;background:rgba(255,253,248,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:10px 8px calc(12px + env(safe-area-inset-bottom));z-index:10}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--ink-soft);padding:4px 12px;border-radius:12px;transition:color .2s}
+.tab svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.active{color:var(--berry)}
+.tab.active svg{stroke-width:2.2}
+
+.toast{position:absolute;left:50%;bottom:104px;transform:translateX(-50%) translateY(16px);background:var(--ink);color:var(--cream);font-size:13.5px;font-weight:500;padding:11px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:all .28s ease;max-width:86%;text-align:center;z-index:90;box-shadow:0 8px 24px rgba(51,39,53,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* discover */
+.local-toggle{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;margin:6px 20px 16px;font-size:13px;font-weight:500;color:var(--ink-soft)}
+.switch{width:42px;height:24px;border-radius:999px;background:var(--line);position:relative;transition:background .2s;margin-left:auto;flex-shrink:0}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on{background:var(--sage)}
+.switch.on::after{transform:translateX(18px)}
+.match-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin:0 20px 16px;padding:22px 20px 18px;animation:cardIn .35s ease}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.match-head{display:flex;gap:16px;align-items:center}
+.avatar{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:24px;font-weight:600;color:#fff;flex-shrink:0;background-size:cover;background-position:center}
+.match-name{font-size:21px;line-height:1.15}
+.match-meta{font-size:13px;color:var(--ink-soft);margin-top:2px}
+.bloom{margin-left:auto;flex-shrink:0;text-align:center}
+.bloom-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px}
+.match-bio{font-size:14px;line-height:1.55;margin:14px 0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:999px}
+.chip.shared{background:var(--sage-tint);color:var(--sage-deep);border:1px solid #CBDCCF}
+.chip.plain{background:var(--gold-tint);color:#8A6A1E;border:1px solid #EBD9AE}
+.chip.astro{background:var(--berry-tint);color:var(--berry-deep)}
+.match-actions{display:flex;gap:12px;margin-top:18px}
+.btn{flex:1;padding:13px 0;border-radius:14px;font-size:15px;font-weight:600;transition:transform .12s ease,filter .15s}
+.btn:active{transform:scale(.97)}
+.btn-pass{background:transparent;border:1.5px solid var(--line);color:var(--ink-soft)}
+.btn-wave{background:var(--berry);color:#fff;position:relative;overflow:hidden}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rip .5s ease-out;pointer-events:none}
+@keyframes rip{to{transform:scale(3);opacity:0}}
+.deck-empty{text-align:center;padding:60px 34px;color:var(--ink-soft)}
+.deck-empty h3{color:var(--ink);font-size:22px;margin-bottom:8px}
+.deck-empty p{font-size:14px;line-height:1.6}
+.deck-empty button{margin-top:18px;background:var(--sage);color:#fff;padding:12px 26px;border-radius:14px;font-weight:600;font-size:14px}
+
+/* chats list */
+.section-label{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);padding:14px 22px 10px}
+.servers{display:flex;gap:12px;overflow-x:auto;padding:2px 20px 8px;scrollbar-width:none}
+.servers::-webkit-scrollbar{display:none}
+.server{flex-shrink:0;width:86px;text-align:center}
+.server-icon{width:60px;height:60px;border-radius:20px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:26px;background:var(--card);border:1.5px solid var(--line);transition:transform .12s;position:relative}
+.server:active .server-icon{transform:scale(.94)}
+.server-name{font-size:11.5px;font-weight:500;color:var(--ink-soft);line-height:1.3}
+.lock{position:absolute;bottom:-2px;right:-2px;background:var(--gold);border-radius:50%;width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid var(--cream)}
+.thread{display:flex;gap:14px;align-items:center;padding:13px 22px;transition:background .15s;width:100%;text-align:left}
+.thread:hover{background:rgba(255,253,248,.9)}
+.thread .avatar{width:50px;height:50px;font-size:20px}
+.thread-body{flex:1;min-width:0}
+.thread-name{font-size:15.5px;font-weight:600}
+.thread-preview{font-size:13.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.thread-time{font-size:11.5px;color:var(--ink-soft);align-self:flex-start;margin-top:4px}
+.unread{width:9px;height:9px;border-radius:50%;background:var(--berry);flex-shrink:0}
+
+/* overlays shared */
+.overlay{position:absolute;inset:0;background:var(--cream);z-index:20;display:none;flex-direction:column}
+.overlay.open{display:flex}
+.ov-top{display:flex;align-items:center;gap:10px;padding:14px 14px 12px;border-bottom:1px solid var(--line);background:var(--card)}
+.back{font-size:22px;color:var(--berry);padding:4px 10px 4px 4px;flex-shrink:0}
+.ov-top .avatar{width:40px;height:40px;font-size:16px}
+.ov-name{font-weight:600;font-size:16px;line-height:1.2}
+.ov-sub{font-size:12px;color:var(--sage-deep)}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--berry)}
+.icon-btn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.msgs{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:78%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.5;animation:cardIn .25s ease}
+.msg.them{background:var(--card);border:1px solid var(--line);border-bottom-left-radius:5px;align-self:flex-start}
+.msg.me{background:var(--berry);color:#fff;border-bottom-right-radius:5px;align-self:flex-end}
+.msg .who{display:block;font-size:11.5px;font-weight:700;margin-bottom:3px}
+.msg.sticker{background:none;border:none;font-size:52px;padding:2px 6px;line-height:1.1}
+.msg.photo{padding:5px;background:var(--card);border:1px solid var(--line)}
+.msg.photo svg{display:block;border-radius:12px;width:210px;height:150px}
+.msg.venue-card{background:var(--gold-tint);border:1px solid #EBD9AE;color:var(--ink);max-width:86%}
+.msg.venue-card b{display:block;margin-bottom:2px}
+.msg.venue-card small{color:#8A6A1E;font-weight:600}
+.anim-wave{display:inline-block;animation:stWave 1s infinite}
+@keyframes stWave{0%,100%{transform:rotate(0)}25%{transform:rotate(22deg)}50%{transform:rotate(-14deg)}75%{transform:rotate(18deg)}}
+.anim-pulse{display:inline-block;animation:stPulse 1s infinite}
+@keyframes stPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.anim-bounce{display:inline-block;animation:stBounce .9s infinite}
+@keyframes stBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.anim-spin{display:inline-block;animation:stSpin 2.4s linear infinite}
+@keyframes stSpin{to{transform:rotate(360deg)}}
+.anim-wiggle{display:inline-block;animation:stWig .7s infinite}
+@keyframes stWig{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.typing{align-self:flex-start;display:flex;gap:4px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:16px;border-bottom-left-radius:5px}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--ink-soft);opacity:.5;animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+.composer-wrap{background:var(--card);border-top:1px solid var(--line)}
+.attach-row{display:none;gap:10px;padding:10px 14px 0}
+.attach-row.open{display:flex}
+.attach-opt{flex:1;background:var(--cream);border:1.5px solid var(--line);border-radius:12px;padding:10px 0;font-size:12.5px;font-weight:600;color:var(--ink-soft);text-align:center}
+.attach-opt span{display:block;font-size:20px;margin-bottom:2px}
+.gif-grid{display:none;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 14px 0}
+.gif-grid.open{display:grid}
+.gif-opt{background:var(--cream);border:1.5px solid var(--line);border-radius:12px;font-size:34px;padding:10px 0}
+.composer{display:flex;gap:8px;padding:12px 14px calc(14px + env(safe-area-inset-bottom));align-items:center}
+.plus-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);color:var(--berry);font-size:22px;flex-shrink:0;line-height:1}
+.composer input{flex:1;border:1.5px solid var(--line);border-radius:999px;padding:11px 18px;font-size:14.5px;background:var(--cream);min-width:0}
+.composer input:focus{outline:none;border-color:var(--berry)}
+.send{width:44px;height:44px;border-radius:50%;background:var(--berry);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send svg{width:20px;height:20px;fill:currentColor}
+
+/* server view */
+.channel-row{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;background:var(--card);border-bottom:1px solid var(--line);scrollbar-width:none}
+.channel-row::-webkit-scrollbar{display:none}
+.ch{flex-shrink:0;font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;background:var(--cream);border:1.5px solid var(--line);color:var(--ink-soft)}
+.ch.active{background:var(--berry);border-color:var(--berry);color:#fff}
+.ch.voice{color:var(--sage-deep);border-color:#CBDCCF;background:var(--sage-tint)}
+
+/* call */
+#callView{background:linear-gradient(160deg,#4E6E5C 0%,#334B3D 100%);color:#fff;align-items:center;justify-content:center;text-align:center}
+.call-inner{display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px}
+.call-ava-wrap{position:relative;width:120px;height:120px;margin-bottom:6px}
+.call-ava-wrap .avatar{width:120px;height:120px;font-size:44px;border:4px solid rgba(255,255,255,.35)}
+.ring{position:absolute;inset:-14px;border:2px solid rgba(255,255,255,.35);border-radius:50%;animation:ringPulse 2s infinite}
+.ring.r2{animation-delay:1s}
+@keyframes ringPulse{0%{transform:scale(.85);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+.call-name{font-family:'Fraunces',serif;font-size:28px}
+.call-status{font-size:14.5px;opacity:.85;font-variant-numeric:tabular-nums}
+.call-grid{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}
+.call-grid .avatar{width:74px;height:74px;font-size:28px;border:3px solid rgba(255,255,255,.3)}
+.call-btns{display:flex;gap:22px;margin-top:26px}
+.call-btn{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.call-btn.active{background:rgba(255,255,255,.5);color:#334B3D}
+.call-btn.end{background:#C34A3A}
+.call-hint{font-size:12px;opacity:.7;margin-top:14px}
+
+/* you */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin:0 20px 16px;padding:20px}
+.card h3{font-size:18px;margin-bottom:4px}
+.card .sub{font-size:13px;color:var(--ink-soft);line-height:1.5}
+.profile-head{display:flex;gap:16px;align-items:center}
+.profile-head .avatar{width:70px;height:70px;font-size:28px;position:relative;cursor:pointer}
+.ava-edit{position:absolute;bottom:-2px;right:-2px;width:24px;height:24px;border-radius:50%;background:var(--gold);border:2px solid var(--card);font-size:12px;display:flex;align-items:center;justify-content:center}
+.name-input{font-family:'Fraunces',serif;font-size:21px;font-weight:600;border:none;background:transparent;width:100%;border-bottom:1.5px dashed transparent}
+.name-input:focus{outline:none;border-bottom-color:var(--gold)}
+.bio-input{width:100%;margin-top:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--cream);padding:11px 13px;font-size:14px;line-height:1.5;resize:none;min-height:64px}
+.bio-input:focus{outline:none;border-color:var(--sage)}
+.save-bio{margin-top:10px;background:var(--sage);color:#fff;padding:10px 20px;border-radius:12px;font-weight:600;font-size:13.5px}
+.streak-row{display:flex;gap:12px;margin:0 20px 16px}
+.stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;text-align:center;box-shadow:var(--shadow)}
+.stat .num{font-family:'Fraunces',serif;font-size:28px;font-weight:600;color:var(--berry)}
+.stat .lbl{font-size:11.5px;color:var(--ink-soft);font-weight:500;margin-top:2px}
+.checkin-cta{width:100%;margin-top:14px;background:var(--sage);color:#fff;padding:13px 0;border-radius:14px;font-weight:600;font-size:15px}
+.q-progress{display:flex;gap:6px;margin:16px 0}
+.q-dot{height:5px;flex:1;border-radius:99px;background:var(--line);transition:background .2s}
+.q-dot.done{background:var(--gold)}
+.q-text{font-family:'Fraunces',serif;font-size:19px;font-weight:600;line-height:1.35;margin-bottom:14px}
+.q-opts{display:flex;flex-direction:column;gap:9px}
+.q-opt{text-align:left;padding:13px 16px;border-radius:13px;font-size:14.5px;font-weight:500;background:var(--cream);border:1.5px solid var(--line);transition:all .15s}
+.q-opt.picked{background:var(--sage-tint);border-color:var(--sage);color:var(--sage-deep)}
+.checkin-done{text-align:center;padding:10px 0 4px}
+.checkin-done .big{font-size:40px}
+.chart-days{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);margin-top:6px;padding:0 4px}
+.premium{background:linear-gradient(135deg,var(--berry) 0%,var(--berry-deep) 100%);color:#fff;border:none}
+.premium h3{color:#fff}
+.premium .sub{color:rgba(255,255,255,.85)}
+.premium-btn{margin-top:14px;background:var(--gold);color:var(--ink);padding:12px 22px;border-radius:13px;font-weight:700;font-size:14px;width:100%}
+.link-btn{margin-top:12px;color:var(--berry);font-weight:600;font-size:14px}
+
+/* trust */
+.verified{display:flex;align-items:center;gap:14px;background:var(--sage-tint);border:1px solid #CBDCCF;border-radius:var(--radius);margin:0 20px 16px;padding:16px 18px}
+.verified .badge{width:44px;height:44px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.verified .badge svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.verified b{font-size:15px;display:block}
+.verified span{font-size:13px;color:var(--sage-deep)}
+.layer{display:flex;gap:14px;align-items:flex-start}
+.layer + .layer{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.layer-icon{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px}
+.layer b{font-size:14.5px;display:block;margin-bottom:3px}
+.layer p{font-size:13.5px;color:var(--ink-soft);line-height:1.55}
+.human-tag{display:inline-block;margin-top:7px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--sage-deep);background:var(--sage-tint);padding:3px 9px;border-radius:99px}
+.crisis{background:var(--gold-tint);border:1px solid #EBD9AE}
+.crisis h3{color:#7A5B14}
+.crisis-btn{margin-top:14px;width:100%;background:var(--ink);color:var(--cream);padding:13px 0;border-radius:13px;font-weight:600;font-size:15px;display:block;text-align:center;text-decoration:none}
+.sim-btn{width:100%;margin-top:14px;background:var(--berry);color:#fff;padding:13px 0;border-radius:14px;font-weight:600;font-size:15px}
+.sim-stage{margin-top:16px;background:var(--cream);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:none}
+.sim-stage.open{display:block}
+.sim-tag{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+.sim-msgs{display:flex;flex-direction:column;gap:9px;min-height:60px}
+.sim-msg{max-width:88%;align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;border-bottom-left-radius:4px;padding:9px 12px;font-size:13.5px;line-height:1.45;animation:cardIn .3s ease;position:relative}
+.sim-msg.flagged{border-color:var(--flag);background:var(--flag-tint)}
+.flag-label{display:block;font-size:10.5px;font-weight:700;color:var(--flag);margin-top:5px;letter-spacing:.03em}
+.sim-verdict{margin-top:12px;background:var(--ink);color:var(--cream);border-radius:12px;padding:13px 14px;font-size:13px;line-height:1.55;animation:cardIn .3s ease}
+.sim-verdict b{color:var(--gold)}
+
+/* meetup sheet */
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:24px 24px 0 0;box-shadow:0 -10px 40px rgba(51,39,53,.25);padding:20px 20px calc(26px + env(safe-area-inset-bottom));z-index:60;transform:translateY(105%);transition:transform .3s ease}
+.sheet.open{transform:none}
+.sheet h3{font-size:19px;margin-bottom:2px}
+.sheet .sub{font-size:13px;color:var(--ink-soft)}
+.venue{display:flex;gap:13px;align-items:center;width:100%;text-align:left;padding:13px 12px;border:1.5px solid var(--line);border-radius:14px;margin-top:11px;transition:border-color .15s}
+.venue:hover{border-color:var(--gold)}
+.venue-icon{width:46px;height:46px;border-radius:13px;background:var(--gold-tint);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.venue b{font-size:14.5px;display:block}
+.venue small{font-size:12.5px;color:var(--ink-soft);display:block;margin-top:1px}
+.spons{margin-left:auto;flex-shrink:0;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:var(--ink);padding:4px 8px;border-radius:99px}
+.sheet-close{width:100%;margin-top:14px;padding:12px 0;border:1.5px solid var(--line);border-radius:13px;font-weight:600;font-size:14px;color:var(--ink-soft)}
+.map-vp{height:250px;margin-top:12px;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;touch-action:none;cursor:grab;background:#F2ECDF;position:relative}
+.map-vp:active{cursor:grabbing}
+.map-vp svg{display:block}
+.map-pin{cursor:pointer}
+.venue-detail{display:none;margin-top:11px;border:1.5px solid #EBD9AE;background:var(--gold-tint);border-radius:14px;padding:12px 14px;animation:cardIn .25s ease}
+.venue-detail.open{display:flex;gap:12px;align-items:center}
+.venue-detail b{font-size:14.5px;display:block}
+.venue-detail small{font-size:12.5px;color:#8A6A1E;display:block;margin-top:1px}
+.venue-go{margin-left:auto;flex-shrink:0;background:var(--berry);color:#fff;font-weight:600;font-size:13px;padding:10px 14px;border-radius:11px}
+.search-input{width:100%;border:1.5px solid var(--line);border-radius:12px;background:var(--card);padding:11px 14px;font-size:14px;margin-top:10px}
+.search-input:focus{outline:none;border-color:var(--sage)}
+.search-results{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.search-hit{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:11px;padding:10px 13px;font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:8px}
+.search-hit .spons{margin-left:auto}
+.search-empty{font-size:13px;color:var(--ink-soft);padding:8px 4px}
+.map-vp.tall{height:400px}
+.sim-week{display:block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:3px}
+.sim-btn.alt{background:var(--sage-deep);margin-top:10px}
+.venue-detail.open.vd-col{flex-direction:column;align-items:stretch;gap:0;padding:16px 16px 14px}
+.vd-head{display:flex;gap:12px;align-items:flex-start}
+.vd-head .venue-icon{margin-top:2px}
+.vd-text{flex:1;min-width:0}
+.vd-score{text-align:right;flex-shrink:0;padding-left:8px}
+.vd-score b{font-family:'Fraunces',serif;font-size:21px;font-weight:600;display:block;line-height:1.1}
+.vd-score small{font-size:10.5px;color:var(--ink-soft);white-space:nowrap}
+.vd-stars{display:flex;align-items:center;gap:3px;margin-top:12px}
+.star{font-size:22px;color:#DACDB0;padding:0 1px;line-height:1}
+.star.on{color:var(--gold)}
+.vd-you{font-size:12px;font-weight:600;color:var(--ink-soft);margin-right:7px}
+.vd-actions{display:flex;margin-top:14px}
+.vd-btn{flex:1;width:100%;padding:14px 0;border-radius:13px;font-weight:600;font-size:15px}
+.vd-save{background:var(--sage);color:#fff}
+.vd-del{background:transparent;border:1.5px solid var(--flag);color:var(--flag)}
+.journal-actions{display:flex;gap:10px}
+.jbtn{flex:1}
+.jbtn.ghost{background:transparent;border:1.5px solid var(--sage);color:var(--sage-deep)}
+.saved-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--sage-tint);color:var(--sage-deep);padding:3px 8px;border-radius:99px;margin-left:4px}
+.new-group{width:38px;height:38px;border-radius:50%;background:var(--berry);color:#fff;font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center}
+.welcome{position:absolute;inset:0;z-index:100;background:rgba(51,39,53,.5);display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .25s}
+.welcome.hide{opacity:0;pointer-events:none}
+.welcome-card{background:var(--card);border-radius:22px;padding:26px 22px 22px;max-width:340px;width:100%;position:relative;box-shadow:0 20px 60px rgba(51,39,53,.35);animation:cardIn .35s ease}
+.welcome-x{position:absolute;top:12px;right:14px;font-size:18px;color:var(--ink-soft);padding:4px}
+.welcome-goal{font-size:14px;line-height:1.55;color:var(--ink);margin:10px 0 16px}
+.welcome-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);line-height:1.45}
+.welcome-row span{font-size:18px;flex-shrink:0;width:24px;text-align:center}
+.welcome-row b{display:block;color:var(--ink);font-size:13.5px}
+.welcome-go{width:100%;margin-top:16px;background:var(--berry);color:#fff;padding:13px 0;border-radius:14px;font-weight:600;font-size:15px}
+.scrim{position:absolute;inset:0;background:rgba(51,39,53,.35);z-index:55;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.open{opacity:1;pointer-events:auto}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- DISCOVER -->
+  <section class="screen active" id="screen-discover">
+    <div class="top"><div class="wordmark">haven<span class="dot">.</span></div></div>
+    <div class="top-sub">People who share your interests, matched on who you are.</div>
+    <div class="local-toggle">
+      <span>Show people near Des Moines</span>
+      <button class="switch on" id="localSwitch" aria-label="Toggle local matching"></button>
+    </div>
+    <div id="deck"></div>
+  </section>
+
+  <!-- CHATS -->
+  <section class="screen" id="screen-chats">
+    <div class="top">
+      <div class="wordmark">Chats</div>
+      <button class="new-group" id="newGroup" aria-label="Create a group">+</button>
+    </div>
+    <div class="section-label">Your groups</div>
+    <div class="servers" id="serversRow"></div>
+    <div class="section-label">Conversations</div>
+    <div id="threads"></div>
+  </section>
+
+  <!-- YOU -->
+  <section class="screen" id="screen-you">
+    <div class="top"><div class="wordmark">You</div></div>
+    <div class="card">
+      <div class="profile-head">
+        <div class="avatar" id="myAvatar" style="background:var(--berry)" role="button" aria-label="Change profile photo">S<span class="ava-edit">&#9998;</span></div>
+        <div style="flex:1">
+          <input class="name-input" id="myName" value="Shreyansh" aria-label="Your name">
+          <div class="chips" style="margin-top:8px">
+            <span class="chip plain">Basketball</span>
+            <span class="chip plain">Cooking</span>
+            <span class="chip plain">Hiking</span>
+            <span class="chip plain">Board games</span>
+            <span class="chip plain">Sci-fi novels</span>
+            <span class="chip plain">True crime pods</span>
+            <span class="chip plain">Coffee shops</span>
+            <span class="chip astro">&#9808; Capricorn</span>
+          </div>
+        </div>
+      </div>
+      <textarea class="bio-input" id="myBio" aria-label="Your bio" placeholder="Write a short bio. What should a new match know about you?">Builder, hooper, and amateur cook. New in town and collecting people for pickup games and Sunday dinners.</textarea>
+      <button class="save-bio" id="saveBio">Save profile</button>
+      <input type="file" id="avaFile" accept="image/*" hidden>
+    </div>
+    <div class="streak-row">
+      <div class="stat"><div class="num" id="streakNum">12</div><div class="lbl">Day streak</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">Active matches</div></div>
+      <div class="stat"><div class="num">2</div><div class="lbl">Groups joined</div></div>
+    </div>
+    <div class="card" id="checkinCard">
+      <h3>Daily check-in</h3>
+      <p class="sub">Five quick questions. Two minutes. Private to you, and today's answers update your chart below.</p>
+      <button class="checkin-cta" id="startCheckin">Start today's check-in</button>
+    </div>
+    <div class="card">
+      <h3>Your week</h3>
+      <p class="sub" id="chartSub">Mood over the last seven days. Today updates after your check-in.</p>
+      <div class="chart-wrap" id="chartWrap"></div>
+      <div class="chart-days"><span>Fri</span><span>Sat</span><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span></div>
+    </div>
+    <div class="card">
+      <h3>Journal</h3>
+      <p class="sub">Today&#8217;s prompt. Name one moment this week when connection felt easy.</p>
+      <textarea class="bio-input" id="journalText" aria-label="Journal entry" placeholder="Write freely. Entries stay private to you."></textarea>
+      <div class="journal-actions">
+        <button class="save-bio jbtn" id="saveJournal">Save entry</button>
+        <button class="save-bio jbtn ghost" id="accessEntries">Access entries</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Share with your therapist</h3>
+      <p class="sub">Export your mood history and journal as a PDF. You choose the date range. Nothing leaves without your say-so.</p>
+      <button class="link-btn" id="exportBtn">Export as PDF &rarr;</button>
+    </div>
+    <div class="card premium">
+      <h3>Haven Plus</h3>
+      <p class="sub">Mood pattern insights, guided journaling, and unlimited exports. Matching and safety stay free for everyone, always.</p>
+      <button class="premium-btn" id="plusBtn">Try free for 14 days</button>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section class="screen" id="screen-map">
+    <div class="top"><div class="wordmark">Map</div></div>
+    <div class="top-sub">Spots to recharge on your own. Gold pins are Haven partners.</div>
+    <div style="padding:6px 20px 0">
+      <input class="search-input" id="tabSearch" placeholder="Search spots nearby" autocomplete="off">
+      <div class="search-results" id="tabResults"></div>
+    </div>
+    <div class="map-vp tall" id="tabMapVp" style="margin:12px 20px 0"></div>
+    <div style="padding:0 20px"><div id="mapDetail"></div></div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="screen" id="screen-trust">
+    <div class="top"><div class="wordmark">Trust</div></div>
+    <div class="verified">
+      <div class="badge"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div><b>Your profile is verified</b><span>ID checked, one account per person, 18+</span></div>
+    </div>
+    <div class="card">
+      <h3>How we keep you safe</h3>
+      <p class="sub" style="margin-bottom:18px">Three layers run in the background. A trained human reviews every flag before anything happens.</p>
+      <div class="layer">
+        <div class="layer-icon" style="background:var(--gold-tint)">&#9825;</div>
+        <div><b>Crisis support, right away</b>
+        <p>If a conversation shows signs of crisis, Haven quietly offers the 988 Lifeline to the person who needs support.</p>
+        <span class="human-tag">Human reviewed</span></div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:var(--berry-tint)">&#9737;</div>
+        <div><b>Predator pattern detection</b>
+        <p>Behavior known to precede harm gets flagged and reviewed by our safety team before a match continues.</p>
+        <span class="human-tag">Human reviewed</span></div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:var(--sage-tint)">&#10047;</div>
+        <div><b>Slow-grooming detector</b>
+        <p>Some manipulation builds over weeks, not messages. A weekly review looks at conversation patterns over time.</p>
+        <span class="human-tag">Human reviewed</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Watch the detector work</h3>
+      <p class="sub">Two simulations show the safety net in action. No real users, no real messages.</p>
+      <button class="sim-btn" id="simBtn">Run the fast detector</button>
+      <div class="sim-stage" id="simStage">
+        <div class="sim-tag">Simulation &middot; scripted messages</div>
+        <div class="sim-msgs" id="simMsgs"></div>
+      </div>
+      <button class="sim-btn alt" id="slowBtn">Run the slow detector</button>
+      <div class="sim-stage" id="slowStage">
+        <div class="sim-tag">Simulation &middot; three weeks, compressed</div>
+        <div class="sim-msgs" id="slowMsgs"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>What we never see</h3>
+      <p class="sub" style="margin-bottom:18px">Safety runs on the minimum data possible. Four commitments hold at every scale.</p>
+      <div class="layer">
+        <div class="layer-icon" style="background:var(--sage-tint)">&#128274;</div>
+        <div><b>Check-ins stay unscanned and unshared</b>
+        <p>Your daily answers feed your private chart and touch nothing else. No detection system reads them.</p></div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:var(--gold-tint)">&#128196;</div>
+        <div><b>Moderators see one excerpt, never full history</b>
+        <p>A flag shows the reviewer the flagged lines alone. The rest of your conversations stay sealed.</p></div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:var(--berry-tint)">&#128202;</div>
+        <div><b>B2B partners get anonymous totals only</b>
+        <p>An employer or university sees participation counts, never names, messages, or moods.</p></div>
+      </div>
+      <div class="layer">
+        <div class="layer-icon" style="background:var(--sage-tint)">&#128465;</div>
+        <div><b>Cleared flags delete within 30 days</b>
+        <p>A false alarm leaves no permanent mark on any account.</p></div>
+      </div>
+    </div>
+    <div class="card crisis">
+      <h3>Need support right now</h3>
+      <p class="sub">The 988 Suicide and Crisis Lifeline is free, confidential, and answers 24/7. Call or text from anywhere in the US.</p>
+      <a class="crisis-btn" href="tel:988">Call or text 988</a>
+    </div>
+  </section>
+
+  <!-- DM OVERLAY -->
+  <div class="overlay" id="chatView">
+    <div class="ov-top">
+      <button class="back" data-close="chatView" aria-label="Back">&larr;</button>
+      <div class="avatar" id="dmAvatar">M</div>
+      <div style="flex:1;min-width:0">
+        <div class="ov-name" id="dmName">Maya</div>
+        <div class="ov-sub" id="dmSub">Matched on 4 shared interests</div>
+      </div>
+      <button class="icon-btn" id="dmCall" aria-label="Voice call"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8 10a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg></button>
+      <button class="icon-btn" id="dmReport" aria-label="Report this conversation" style="color:var(--flag)"><svg viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+    </div>
+    <div class="msgs" id="dmMsgs"></div>
+    <div class="composer-wrap">
+      <div class="attach-row" id="attachRow">
+        <button class="attach-opt" id="optPhoto"><span>&#128247;</span>Photo</button>
+        <button class="attach-opt" id="optGif"><span>&#10024;</span>GIF</button>
+        <button class="attach-opt" id="optMeet"><span>&#128205;</span>Meet up</button>
+      </div>
+      <div class="gif-grid" id="gifGrid"></div>
+      <div class="composer">
+        <button class="plus-btn" id="plusToggle" aria-label="Attachments">+</button>
+        <input id="dmInput" type="text" placeholder="Say something kind" aria-label="Message" autocomplete="off">
+        <button class="send" id="dmSend" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M2.5 21.5l19-9.5-19-9.5v7.6l13 1.9-13 1.9z"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVER OVERLAY -->
+  <div class="overlay" id="serverView">
+    <div class="ov-top">
+      <button class="back" data-close="serverView" aria-label="Back">&larr;</button>
+      <div class="avatar" id="svIcon" style="background:var(--sage-tint);color:var(--ink);font-size:20px">&#127807;</div>
+      <div style="flex:1;min-width:0">
+        <div class="ov-name" id="svName">Trail Walkers</div>
+        <div class="ov-sub" id="svSub">186 members &middot; Public &middot; verified only</div>
+      </div>
+    </div>
+    <div class="channel-row" id="channelRow"></div>
+    <div class="msgs" id="svMsgs"></div>
+    <div class="composer-wrap">
+      <div class="attach-row" id="svAttachRow">
+        <button class="attach-opt" id="svOptPhoto"><span>&#128247;</span>Photo</button>
+        <button class="attach-opt" id="svOptGif"><span>&#10024;</span>GIF</button>
+        <button class="attach-opt" id="svOptMeet"><span>&#128205;</span>Meet up</button>
+      </div>
+      <div class="gif-grid" id="svGifGrid"></div>
+      <div class="composer">
+        <button class="plus-btn" id="svPlusToggle" aria-label="Attachments">+</button>
+        <input id="svInput" type="text" placeholder="Message the group" aria-label="Message" autocomplete="off">
+        <button class="send" id="svSend" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M2.5 21.5l19-9.5-19-9.5v7.6l13 1.9-13 1.9z"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALL OVERLAY -->
+  <div class="overlay" id="callView">
+    <div class="call-inner">
+      <div id="callAvatars"></div>
+      <div class="call-name" id="callName">Maya</div>
+      <div class="call-status" id="callStatus">Connecting&hellip;</div>
+      <div class="call-btns">
+        <button class="call-btn" id="muteBtn" aria-label="Mute">&#127908;</button>
+        <button class="call-btn" id="spkBtn" aria-label="Speaker">&#128266;</button>
+        <button class="call-btn end" id="endBtn" aria-label="End call">&#128379;</button>
+      </div>
+      <div class="call-hint">Calls connect only between matched, verified accounts</div>
+    </div>
+  </div>
+
+  <!-- MEETUP SHEET -->
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="meetSheet">
+    <h3>Pick a spot to meet</h3>
+    <p class="sub">Suggestions sit near you. Gold pins are Haven partner spots. Drag the map or search, then tap a pin.</p>
+    <input class="search-input" id="meetSearch" placeholder="Search spots on the map" autocomplete="off">
+    <div class="search-results" id="meetResults"></div>
+    <div class="map-vp" id="mapVp"></div>
+    <div id="venueDetail"></div>
+    <button class="sheet-close" id="sheetClose">Not now</button>
+  </div>
+
+  <!-- WELCOME POPUP -->
+  <div class="welcome" id="welcome">
+    <div class="welcome-card">
+      <div class="wordmark" style="font-size:28px">Welcome to Haven<span class="dot">!</span></div>
+      <p class="welcome-goal">Haven matches you with people who share your interests. Connection comes first, and loneliness gets smaller.</p>
+      <div class="welcome-row"><span>&#128269;</span><div><b>Discover</b>Browse matches and wave to open a chat</div></div>
+      <div class="welcome-row"><span>&#128172;</span><div><b>Chats</b>Message matches, join groups, plan meetups</div></div>
+      <div class="welcome-row"><span>&#128205;</span><div><b>Map</b>Find partner spots and quiet places near you</div></div>
+      <div class="welcome-row"><span>&#127807;</span><div><b>You</b>Daily check-in, mood chart, your profile</div></div>
+      <div class="welcome-row"><span>&#128737;</span><div><b>Trust</b>Verification, safety systems, live demos</div></div>
+      <button class="welcome-go" id="welcomeGo">Start exploring</button>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <nav class="tabbar">
+    <button class="tab active" data-screen="discover"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>Discover</button>
+    <button class="tab" data-screen="chats"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-9 8.4 8.5 8.5 0 01-3.9-.9L3 21l2-5.1a8.38 8.38 0 01-.9-3.9 8.5 8.5 0 018.5-8.5 8.38 8.38 0 018.4 8z"/></svg>Chats</button>
+    <button class="tab" data-screen="map"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Map</button>
+    <button class="tab" data-screen="you"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>You</button>
+    <button class="tab" data-screen="trust"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Trust</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let toastTimer;
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+/* welcome popup */
+function closeWelcome(){$('#welcome').classList.add('hide');}
+$('#welcomeGo').addEventListener('click',closeWelcome);
+
+/* create group */
+$('#newGroup').addEventListener('click',()=>{
+  toast('Group creation opens in the full app. Any verified member starts one around any interest.');
+});
+
+/* tabs */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    $('#screen-'+tab.dataset.screen).classList.add('active');
+    document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open'));
+    stopCall();
+    if(tab.dataset.screen==='map'){
+      const vp=$('#tabMapVp');
+      if(vp&&vp._panTo)vp._panTo(430,250);
+    }
+  });
+});
+document.querySelectorAll('[data-close]').forEach(b=>{
+  b.addEventListener('click',()=>$('#'+b.dataset.close).classList.remove('open'));
+});
+
+/* ===== DISCOVER ===== */
+function bloom(score){
+  return `<div class="bloom" aria-label="${score} percent compatible">
+    <svg width="64" height="46" viewBox="0 0 64 46">
+      <defs><clipPath id="c${score}"><circle cx="26" cy="23" r="18"/></clipPath></defs>
+      <circle cx="26" cy="23" r="18" fill="#F3E3EA" stroke="#8E3A5F" stroke-width="1.5"/>
+      <circle cx="38" cy="23" r="18" fill="#E3ECE5" fill-opacity=".85" stroke="#4E6E5C" stroke-width="1.5"/>
+      <circle cx="38" cy="23" r="18" clip-path="url(#c${score})" fill="#D9A441" fill-opacity=".9"/>
+      <text x="32" y="27" text-anchor="middle" font-family="Fraunces,Georgia,serif" font-size="12" font-weight="700" fill="#332735">${score}</text>
+    </svg><div class="bloom-label">shared</div></div>`;
+}
+const localPeople=[
+ {name:'Maya',age:29,dist:'3 mi away',score:87,color:'#6F8F7C',initial:'M',astro:'&#9800; Aries',
+  bio:'Watercolor painter and slow hiker. Rebuilding a social life after a cross-country move and looking for people who like quiet company.',
+  shared:['Hiking','Board games','True crime pods'],other:['Watercolor','Pottery'],
+  preview:'Saturday works! Bring your board game bag',time:'2m',
+  msgs:[
+   {who:'them',t:'Okay I finally did the reservoir loop you recommended'},
+   {who:'them',t:'The overlook at the halfway point is unreal'},
+   {who:'me',t:'Right?? Best sunrise spot in the city'},
+   {who:'them',t:'Saturday works! Bring your board game bag, loser buys coffee after'}],
+  replies:['Deal. I\u2019ll bring Cascadia and the folding stools',
+   'Meet at the north lot at 10? Parking is easier there',
+   'First one to spot a heron picks the coffee spot']},
+ {name:'Devon',age:34,dist:'6 mi away',score:81,color:'#8E3A5F',initial:'D',astro:'&#9803; Gemini',
+  bio:'Night-shift nurse, daytime birder. Wants a walking buddy who is fine with long silences and sudden stops to look at hawks.',
+  shared:['Coffee shops','Sci-fi novels'],other:['Birding','Chess','Vinyl'],
+  preview:'Thursday morning before my shift?',time:'now',
+  msgs:[
+   {who:'them',t:'Saw a red-tailed hawk on my walk home from shift. Made my whole week'},
+   {who:'them',t:'Also 80 pages into the book you recommended. The ship AI chapters are so good'},
+   {who:'them',t:'Coffee Thursday morning before my shift? They open at 7'}],
+  replies:['Deal. I\u2019ll grab the window table if I get there first',
+   'No spoilers but the ending rearranged my brain']},
+ {name:'Priya',age:26,dist:'2 mi away',score:92,color:'#B98A2E',initial:'P',astro:'&#9806; Virgo',
+  bio:'Learning to cook her grandmother\u2019s recipes. New to the city, hosts a small Sunday soup night and saves a seat for one more.',
+  shared:['Cooking','Board games'],other:['Photography','Trivia nights','Climbing'],
+  preview:'Soup night is Sunday at 6 if you\u2019re free',time:'now',
+  msgs:[
+   {who:'them',t:'Soup night is Sunday at 6 if you\u2019re free'},
+   {who:'them',t:'This week is my grandmother\u2019s rasam. Fair warning, there will be seconds'}],
+  replies:['You have to teach me the spice blend',
+   'Should I bring bread or a board game for after? Or both']},
+];
+const farPeople=[
+ {name:'Theo',age:41,dist:'Minneapolis, MN',score:89,color:'#4E6E5C',initial:'T',astro:'&#9809; Libra',
+  bio:'Woodworker who talks to his dog like a coworker. Hosts an online board game table on Wednesdays and trades audiobook picks.',
+  shared:['Board games','Sci-fi novels'],other:['Chess','Woodworking','Sourdough'],
+  preview:'Wednesday table has an open seat',time:'now',
+  msgs:[
+   {who:'them',t:'Wednesday table has an open seat. We play over video, board on camera'},
+   {who:'them',t:'This week is a sci-fi deck builder, right up your alley'}],
+  replies:['Deal me in. What do I need before Wednesday?',
+   'Sold. Sending you my audiobook list after']},
+ {name:'Rosa',age:31,dist:'Chicago, IL',score:84,color:'#8E3A5F',initial:'R',astro:'&#9812; Pisces',
+  bio:'ER scribe by day, kitchen experimenter by night. Wants a weekly cook-along over video call, mistakes encouraged.',
+  shared:['Cooking','True crime pods'],other:['Watercolor','Salsa dancing'],
+  preview:'Sunday cook-along, one recipe, two kitchens',time:'now',
+  msgs:[
+   {who:'them',t:'Sunday cook-along, one recipe, two kitchens, zero pressure'},
+   {who:'them',t:'Also episode 4 of the lighthouse case broke my brain. No spoilers'}],
+  replies:['Sunday works. Pick something with a lot of garlic',
+   'No spoilers, promise. Calling you when I finish the episode']},
+ {name:'June',age:57,dist:'Portland, OR',score:90,color:'#B98A2E',initial:'J',astro:'&#9801; Taurus',
+  bio:'Recently retired teacher relearning how weekends work. Runs a long-distance game night and always wants one more voice.',
+  shared:['Board games','Hiking'],other:['Quiet reading','Gardening','Birding'],
+  preview:'Game night is Friday, we teach as we play',time:'now',
+  msgs:[
+   {who:'them',t:'Game night is Friday, we teach as we play, no experience needed'},
+   {who:'them',t:'Also send me your favorite local trail. Adding a photo tour to our calls'}],
+  replies:['Friday works. I call the green pieces',
+   'Sending three trails. The reservoir loop wins']},
+];
+let localOn=true,deckIndex=0;
+function pool(){return localOn?localPeople:farPeople;}
+function renderCard(){
+  const deck=$('#deck'),list=pool();
+  if(deckIndex>=list.length){
+    deck.innerHTML=`<div class="deck-empty"><h3>That's everyone for today</h3>
+      <p>New matches arrive each morning. Starting over also resets your demo chats.</p>
+      <button id="deckReset">Start over</button></div>`;
+    $('#deckReset').addEventListener('click',()=>{
+      deckIndex=0;
+      matched.length=0;
+      renderThreads();
+      renderCard();
+    });
+    return;
+  }
+  const p=list[deckIndex],score=p.score;
+  deck.innerHTML=`<div class="match-card">
+    <div class="match-head">
+      <div class="avatar" style="background:${p.color}">${p.initial}</div>
+      <div><div class="match-name serif">${p.name}, ${p.age}</div><div class="match-meta">${p.dist}</div></div>
+      ${bloom(score)}
+    </div>
+    <p class="match-bio">${p.bio}</p>
+    <div class="chips">
+      ${p.shared.map(s=>`<span class="chip shared">&#10047; ${s}</span>`).join('')}
+      ${p.other.map(s=>`<span class="chip plain">${s}</span>`).join('')}
+      <span class="chip astro">${p.astro}</span>
+    </div>
+    <div class="match-actions">
+      <button class="btn btn-pass" id="passBtn">Pass</button>
+      <button class="btn btn-wave" id="waveBtn">&#128075; Wave hello</button>
+    </div></div>`;
+  $('#passBtn').addEventListener('click',()=>{deckIndex++;renderCard();});
+  $('#waveBtn').addEventListener('click',function(e){
+    const r=document.createElement('span');r.className='ripple';
+    const rect=this.getBoundingClientRect(),size=Math.max(rect.width,rect.height);
+    r.style.width=r.style.height=size+'px';
+    r.style.left=(e.clientX-rect.left-size/2)+'px';
+    r.style.top=(e.clientY-rect.top-size/2)+'px';
+    this.appendChild(r);
+    if(!matched.includes(p)){matched.push(p);renderThreads();}
+    toast(`${p.name} waved back! Chat opened in Chats.`);
+    setTimeout(()=>{deckIndex++;renderCard();},650);
+  });
+}
+renderCard();
+$('#localSwitch').addEventListener('click',function(){
+  this.classList.toggle('on');
+  localOn=this.classList.contains('on');
+  deckIndex=0;
+  renderCard();
+  toast(localOn?'Showing people near you':'Showing people everywhere');
+});
+
+/* ===== SERVERS ===== */
+const members=[
+ {n:'Jordan',c:'#6F8F7C'},{n:'Sam',c:'#B98A2E'},{n:'Riley',c:'#8E3A5F'},{n:'Ana',c:'#4E6E5C'}
+];
+const servers=[
+ {id:'trail',emoji:'\u{1F33F}',name:'Trail Walkers',members:12,privacy:'Public',
+  channels:{
+   'general':[
+    {n:'Jordan',c:'#6F8F7C',t:'Reservoir loop was perfect this morning. Zero mud finally'},
+    {n:'Ana',c:'#4E6E5C',t:'Anyone up for the Saturday sunrise walk? Meeting at the north lot'},
+    {n:'Sam',c:'#B98A2E',t:'In! Bringing the good trail mix this time'}],
+   'trail-pics':[
+    {n:'Riley',c:'#8E3A5F',t:'PHOTO'},
+    {n:'Riley',c:'#8E3A5F',t:'Heron just standing there like he owns the place'},
+    {n:'Jordan',c:'#6F8F7C',t:'Frame this one. Seriously'}],
+   'plan-a-hike':[
+    {n:'Ana',c:'#4E6E5C',t:'Ledges state park, two weekends out. Carpool from the coop?'},
+    {n:'Sam',c:'#B98A2E',t:'Two seats open in my car'}]
+  },voice:'Campfire'},
+ {id:'board',emoji:'\u{1F3B2}',name:'Board Game Nights',members:13,privacy:'Public',
+  channels:{
+   'general':[
+    {n:'Sam',c:'#B98A2E',t:'Thursday table has two seats left. Wingspan and one mystery pick'},
+    {n:'Riley',c:'#8E3A5F',t:'Claiming a seat. Bringing my sleeved copy of Cascadia'}],
+   'game-finder':[
+    {n:'Jordan',c:'#6F8F7C',t:'Anyone own Heat? Want to try before buying'},
+    {n:'Ana',c:'#4E6E5C',t:'I do! Bringing to Thursday'}]
+  },voice:'Table Talk'},
+ {id:'cooks',emoji:'\u{1F373}',name:'Sunday Cooks',members:9,privacy:'Private',
+  channels:{
+   'general':[
+    {n:'Priya',c:'#B98A2E',t:'This week is dumplings. All skill levels, extra rolling pins on hand'},
+    {n:'Ana',c:'#4E6E5C',t:'Saving my Sunday. What should I bring?'}],
+   'recipes':[
+    {n:'Priya',c:'#B98A2E',t:'Posted the dough ratio in the pinned note. Rest the dough 30 min minimum'}]
+  },voice:'Kitchen Radio'},
+ {id:'read',emoji:'\u{1F4DA}',name:'Quiet Readers',members:11,privacy:'Public',
+  channels:{
+   'general':[
+    {n:'Riley',c:'#8E3A5F',t:'Silent reading hour at the library cafe went great. Same time next week'}],
+   'what-i-read':[
+    {n:'Jordan',c:'#6F8F7C',t:'Finished Piranesi in two sittings. Anyone want my copy?'}]
+  },voice:'Reading Room'},
+];
+$('#serversRow').innerHTML=servers.map((s,i)=>`
+  <button class="server" data-i="${i}">
+    <div class="server-icon">${s.emoji}${s.privacy==='Private'?'<span class="lock">&#128274;</span>':''}</div>
+    <div class="server-name">${s.name}</div>
+  </button>`).join('');
+
+let curServer=null,curChannel=null;
+document.querySelectorAll('.server').forEach(el=>{
+  el.addEventListener('click',()=>openServer(servers[el.dataset.i]));
+});
+function openServer(s){
+  curServer=s;
+  $('#svIcon').innerHTML=s.emoji;
+  $('#svName').textContent=s.name;
+  $('#svSub').textContent=`${s.members} members \u00B7 ${s.privacy} \u00B7 verified only`;
+  const chNames=Object.keys(s.channels);
+  $('#channelRow').innerHTML=
+    chNames.map(c=>`<button class="ch" data-ch="${c}"># ${c}</button>`).join('')+
+    `<button class="ch voice" id="voiceCh">&#128266; ${s.voice}</button>`;
+  document.querySelectorAll('#channelRow .ch[data-ch]').forEach(b=>{
+    b.addEventListener('click',()=>openChannel(b.dataset.ch));
+  });
+  $('#voiceCh').addEventListener('click',()=>startCall({group:true,name:s.voice,sub:s.name}));
+  openChannel(chNames[0]);
+  $('#serverView').classList.add('open');
+}
+function photoSVG(){
+  return `<svg viewBox="0 0 210 150"><rect width="210" height="150" fill="#DCE7DE"/>
+    <path d="M0,105 Q52,72 105,95 T210,82 L210,150 L0,150 Z" fill="#6F8F7C"/>
+    <path d="M0,120 Q70,95 140,115 T210,108 L210,150 L0,150 Z" fill="#4E6E5C"/>
+    <circle cx="165" cy="38" r="17" fill="#D9A441"/>
+    <path d="M30,150 L48,112 L66,150 Z" fill="#334B3D"/><path d="M55,150 L75,105 L95,150 Z" fill="#3E5A4A"/></svg>`;
+}
+function channelMsgHTML(m){
+  const body=m.t==='PHOTO'?photoSVG():esc(m.t);
+  const cls=m.t==='PHOTO'?'msg them photo':'msg them';
+  return `<div class="${cls}"><span class="who" style="color:${m.c}">${m.n}</span>${body}</div>`;
+}
+function openChannel(name){
+  curChannel=name;
+  document.querySelectorAll('#channelRow .ch[data-ch]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.ch===name);
+  });
+  const box=$('#svMsgs');
+  box.innerHTML=curServer.channels[name].map(channelMsgHTML).join('');
+  box.scrollTop=box.scrollHeight;
+}
+const groupReplies=[
+ 'Love this. Count me in',
+ 'Adding to the calendar right now',
+ 'Same! See everyone there',
+ 'This group keeps saving my week, honestly'
+];
+function svSend(){
+  const input=$('#svInput'),text=input.value.trim();
+  if(!text||!curServer)return;
+  const box=$('#svMsgs');
+  const mine=document.createElement('div');mine.className='msg me';mine.textContent=text;
+  box.appendChild(mine);input.value='';box.scrollTop=box.scrollHeight;
+  const m=members[Math.floor(Math.random()*members.length)];
+  setTimeout(()=>{
+    box.insertAdjacentHTML('beforeend',
+      `<div class="msg them"><span class="who" style="color:${m.c}">${m.n}</span>${esc(groupReplies[Math.floor(Math.random()*groupReplies.length)])}</div>`);
+    box.scrollTop=box.scrollHeight;
+  },1400);
+}
+$('#svSend').addEventListener('click',svSend);
+$('#svInput').addEventListener('keydown',e=>{if(e.key==='Enter')svSend();});
+
+function svGroupReact(text){
+  const box=$('#svMsgs'),m=members[Math.floor(Math.random()*members.length)];
+  setTimeout(()=>{
+    box.insertAdjacentHTML('beforeend',
+      `<div class="msg them"><span class="who" style="color:${m.c}">${m.n}</span>${esc(text)}</div>`);
+    box.scrollTop=box.scrollHeight;
+  },1400);
+}
+function svCloseAttach(){$('#svAttachRow').classList.remove('open');$('#svGifGrid').classList.remove('open');}
+$('#svPlusToggle').addEventListener('click',()=>{
+  $('#svGifGrid').classList.remove('open');
+  $('#svAttachRow').classList.toggle('open');
+});
+$('#svOptGif').addEventListener('click',()=>{
+  $('#svAttachRow').classList.remove('open');
+  $('#svGifGrid').classList.add('open');
+});
+$('#svOptPhoto').addEventListener('click',()=>{
+  const box=$('#svMsgs');
+  box.insertAdjacentHTML('beforeend',`<div class="msg me photo">${photoSVG()}</div>`);
+  box.scrollTop=box.scrollHeight;
+  svCloseAttach();
+  svGroupReact('Great shot! Adding this spot to the next walk');
+});
+
+/* ===== DM THREADS (built from waves) ===== */
+let matched=[],curThread=null,replyIdx=0;
+function renderThreads(){
+  const box=$('#threads');
+  if(!matched.length){
+    box.innerHTML=`<div class="deck-empty" style="padding:36px 34px">
+      <h3>No chats yet</h3>
+      <p>Wave at someone in Discover. When they wave back, the conversation lands here.</p></div>`;
+    return;
+  }
+  box.innerHTML=matched.map((t,i)=>`
+    <button class="thread" data-i="${i}">
+      <div class="avatar" style="background:${t.color}">${t.initial}</div>
+      <div class="thread-body"><div class="thread-name">${t.name}</div><div class="thread-preview">${t.preview}</div></div>
+      <div class="thread-time">${t.time}</div><div class="unread"></div>
+    </button>`).join('');
+  box.querySelectorAll('.thread').forEach(el=>{
+    el.addEventListener('click',()=>openDM(matched[el.dataset.i]));
+  });
+}
+renderThreads();
+function dmMsgHTML(m){
+  if(m.type==='sticker')return `<div class="msg sticker ${m.who}" style="align-self:${m.who==='me'?'flex-end':'flex-start'}"><span class="${m.anim}">${m.t}</span></div>`;
+  if(m.type==='photo')return `<div class="msg ${m.who} photo">${photoSVG()}</div>`;
+  if(m.type==='venue')return `<div class="msg venue-card" style="align-self:flex-end"><b>&#128205; ${m.t}</b>${m.d}${m.partner?`<br><small>Partner venue &middot; ${m.perk}</small>`:''}</div>`;
+  return `<div class="msg ${m.who}">${esc(m.t)}</div>`;
+}
+function openDM(t){
+  curThread=t;replyIdx=0;
+  $('#dmAvatar').textContent=t.initial;
+  $('#dmAvatar').style.background=t.color;
+  $('#dmName').textContent=t.name;
+  $('#dmSub').textContent=`Matched on ${t.shared.length} shared interest${t.shared.length===1?'':'s'}`;
+  const box=$('#dmMsgs');
+  box.innerHTML=t.msgs.map(dmMsgHTML).join('');
+  box.scrollTop=box.scrollHeight;
+  $('#dmInput').value='';
+  closeAttach();
+  $('#chatView').classList.add('open');
+}
+function pushDM(m){
+  curThread.msgs.push(m);
+  const box=$('#dmMsgs');
+  box.insertAdjacentHTML('beforeend',dmMsgHTML(m));
+  box.scrollTop=box.scrollHeight;
+}
+function themReply(customText){
+  const box=$('#dmMsgs');
+  const typing=document.createElement('div');
+  typing.className='typing';typing.innerHTML='<span></span><span></span><span></span>';
+  setTimeout(()=>{box.appendChild(typing);box.scrollTop=box.scrollHeight;},500);
+  setTimeout(()=>{
+    typing.remove();
+    const text=customText||curThread.replies[replyIdx%curThread.replies.length];
+    if(!customText)replyIdx++;
+    pushDM({who:'them',t:text});
+  },1900);
+}
+function dmSend(){
+  const input=$('#dmInput'),text=input.value.trim();
+  if(!text)return;
+  pushDM({who:'me',t:text});
+  input.value='';
+  themReply();
+}
+$('#dmSend').addEventListener('click',dmSend);
+$('#dmInput').addEventListener('keydown',e=>{if(e.key==='Enter')dmSend();});
+$('#dmReport').addEventListener('click',()=>{
+  toast('Report sent. A trained moderator reviews every report, high severity first.');
+});
+
+/* attachments */
+const stickers=[
+ {t:'\u{1F44B}',anim:'anim-wave'},{t:'\u2764\uFE0F',anim:'anim-pulse'},{t:'\u{1F64C}',anim:'anim-bounce'},
+ {t:'\u2728',anim:'anim-spin'},{t:'\u2615',anim:'anim-wiggle'},{t:'\u{1F31E}',anim:'anim-spin'}
+];
+$('#gifGrid').innerHTML=stickers.map((s,i)=>`<button class="gif-opt" data-i="${i}"><span class="${s.anim}">${s.t}</span></button>`).join('');
+$('#svGifGrid').innerHTML=stickers.map((s,i)=>`<button class="gif-opt sv-gif" data-i="${i}"><span class="${s.anim}">${s.t}</span></button>`).join('');
+document.querySelectorAll('.sv-gif').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const s=stickers[b.dataset.i],box=$('#svMsgs');
+    box.insertAdjacentHTML('beforeend',`<div class="msg sticker me" style="align-self:flex-end"><span class="${s.anim}">${s.t}</span></div>`);
+    box.scrollTop=box.scrollHeight;
+    svCloseAttach();
+    svGroupReact('Ha! Same energy over here');
+  });
+});
+function closeAttach(){$('#attachRow').classList.remove('open');$('#gifGrid').classList.remove('open');}
+$('#plusToggle').addEventListener('click',()=>{
+  $('#gifGrid').classList.remove('open');
+  $('#attachRow').classList.toggle('open');
+});
+$('#optGif').addEventListener('click',()=>{
+  $('#attachRow').classList.remove('open');
+  $('#gifGrid').classList.add('open');
+});
+document.querySelectorAll('#gifGrid .gif-opt').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const s=stickers[b.dataset.i];
+    pushDM({who:'me',type:'sticker',t:s.t,anim:s.anim});
+    closeAttach();
+    themReply();
+  });
+});
+$('#optPhoto').addEventListener('click',()=>{
+  pushDM({who:'me',type:'photo'});
+  closeAttach();
+  themReply('Okay this view is gorgeous. Saturday cannot come fast enough');
+});
+
+/* meetup venues + shared map */
+const venues=[
+ {icon:'\u2615',name:'Harvest & Grounds',d:'Coffee house \u00B7 0.4 mi \u00B7 quiet back room',perk:'Two free pastries on check-in',x:330,y:185,rating:4.8,votes:212},
+ {icon:'\u{1F3B2}',name:'Meeple\u2019s Game Cafe',d:'Board game cafe \u00B7 0.6 mi \u00B7 500 game library',perk:'First table hour free',x:500,y:310,rating:4.6,votes:168},
+ {icon:'\u{1F333}',name:'Gray\u2019s Lake Pavilion',d:'Park + kiosk \u00B7 0.9 mi \u00B7 lakeside trail',perk:'10% off at the kiosk',x:590,y:400,rating:4.7,votes:190}
+];
+const pois=[
+ {x:210,y:150,n:'First Federal Bank',rating:3.9,votes:44},
+ {x:380,y:120,n:'Corner Pharmacy',rating:4.2,votes:61},
+ {x:530,y:200,n:'Sud City Laundromat',rating:4.0,votes:38},
+ {x:250,y:395,n:'Hardware & Co',rating:4.4,votes:57},
+ {x:400,y:470,n:'Gas & Go',rating:3.8,votes:73},
+ {x:660,y:150,n:'Riverside Dental',rating:4.1,votes:52},
+ {x:170,y:260,n:'Copy & Print Shop',rating:4.3,votes:29},
+ {x:560,y:510,n:'Fade Barbershop',rating:4.6,votes:88},
+ {x:700,y:320,n:'Petal Florist',rating:4.5,votes:47}
+];
+const landmarks=[
+ {x:170,y:390,n:'Ashby Park',d:'Benches, shade, and a reading lawn',rating:4.9,votes:324},
+ {x:640,y:450,n:'Gray\u2019s Lake',d:'Lakeside loop, quiet mornings',rating:4.8,votes:281}
+];
+const savedSpots=new Set();
+const YOU={x:430,y:250};
+const MW=760,MH=560;
+function mapMarkup(){
+  const roadsH=[100,220,340,460].map(y=>`<line x1="0" y1="${y}" x2="${MW}" y2="${y}" stroke="#FBF6ED" stroke-width="16"/>`).join('');
+  const roadsV=[140,300,460,620].map(x=>`<line x1="${x}" y1="0" x2="${x}" y2="${MH}" stroke="#FBF6ED" stroke-width="16"/>`).join('');
+  const poiDots=pois.map((p,i)=>`
+    <g class="map-poi" data-i="${i}" style="cursor:pointer">
+      <circle cx="${p.x}" cy="${p.y}" r="6" fill="#C8BFAE"/>
+      <text x="${p.x}" y="${p.y+18}" text-anchor="middle" font-size="10" fill="#9A8FA0" font-family="Inter,sans-serif">${p.n}</text>
+    </g>`).join('');
+  const pins=venues.map((v,i)=>`
+    <g class="map-pin" data-i="${i}">
+      <circle cx="${v.x}" cy="${v.y}" r="16" fill="#D9A441" opacity=".45">
+        <animate attributeName="r" values="16;26;16" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values=".45;0;.45" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="${v.x}" cy="${v.y}" r="16" fill="#D9A441" stroke="#FFFDF8" stroke-width="3"/>
+      <text x="${v.x}" y="${v.y+5}" text-anchor="middle" font-size="14">${v.icon}</text>
+      <text x="${v.x}" y="${v.y+34}" text-anchor="middle" font-size="12" font-weight="700" fill="#332735"
+        font-family="Inter,sans-serif" stroke="#FFFDF8" stroke-width="3" paint-order="stroke">${v.name}</text>
+    </g>`).join('');
+  const savedRings=[...savedSpots].map(key=>{
+    const parts=key.split('-'),kind=parts[0],i=Number(parts[1]);
+    let x,y;
+    if(kind==='partner'){x=venues[i].x;y=venues[i].y;
+      return `<circle cx="${x}" cy="${y}" r="23" fill="none" stroke="#6F8F7C" stroke-width="3" opacity=".9"/>`;}
+    if(kind==='poi'){x=pois[i].x;y=pois[i].y;}
+    else{x=landmarks[i].x;y=landmarks[i].y;}
+    return `<circle cx="${x}" cy="${y}" r="9" fill="#6F8F7C" opacity=".3">
+        <animate attributeName="r" values="9;13;9" dur="2.6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="${x}" cy="${y}" r="10" fill="none" stroke="#6F8F7C" stroke-width="2.5" opacity=".85"/>`;
+  }).join('');
+  return `
+   <svg width="${MW}" height="${MH}" viewBox="0 0 ${MW} ${MH}" style="position:absolute;left:0;top:0">
+    <rect width="${MW}" height="${MH}" fill="#F2ECDF"/>
+    ${roadsH}${roadsV}
+    <line x1="60" y1="${MH}" x2="${MW}" y2="60" stroke="#FBF6ED" stroke-width="20"/>
+    <rect x="80" y="320" width="180" height="140" rx="20" fill="#DCE7DE"/>
+    <text x="170" y="395" text-anchor="middle" font-size="12" fill="#4E6E5C" font-family="Inter,sans-serif">Ashby Park</text>
+    <ellipse cx="640" cy="450" rx="95" ry="65" fill="#CBDCCF"/>
+    <text x="640" y="455" text-anchor="middle" font-size="12" fill="#4E6E5C" font-family="Inter,sans-serif">Gray\u2019s Lake</text>
+    ${poiDots}
+    ${savedRings}
+    <circle cx="${YOU.x}" cy="${YOU.y}" r="10" fill="#8E3A5F" stroke="#FFFDF8" stroke-width="3"/>
+    <text x="${YOU.x}" y="${YOU.y-16}" text-anchor="middle" font-size="12" font-weight="700" fill="#8E3A5F"
+      font-family="Inter,sans-serif" stroke="#FFFDF8" stroke-width="3" paint-order="stroke">You</text>
+    ${pins}
+   </svg>`;
+}
+function setupMap(vp,onPartner,onPoi){
+  vp.innerHTML=mapMarkup();
+  const svg=vp.querySelector('svg');
+  const st={ox:0,oy:0,drag:false,sx:0,sy:0,dist:0};
+  function apply(){
+    const minX=vp.clientWidth-MW,minY=vp.clientHeight-MH;
+    st.ox=Math.min(0,Math.max(minX,st.ox));
+    st.oy=Math.min(0,Math.max(minY,st.oy));
+    svg.style.transform=`translate(${st.ox}px,${st.oy}px)`;
+  }
+  vp._panTo=(x,y)=>{st.ox=vp.clientWidth/2-x;st.oy=vp.clientHeight/2-y;apply();};
+  vp.addEventListener('pointerdown',e=>{
+    st.drag=true;st.dist=0;
+    st.pin=e.target.closest('.map-pin');
+    st.poi=e.target.closest('.map-poi');
+    st.sx=e.clientX-st.ox;st.sy=e.clientY-st.oy;
+    vp.setPointerCapture(e.pointerId);
+  });
+  vp.addEventListener('pointermove',e=>{
+    if(!st.drag)return;
+    const nx=e.clientX-st.sx,ny=e.clientY-st.sy;
+    st.dist+=Math.abs(nx-st.ox)+Math.abs(ny-st.oy);
+    st.ox=nx;st.oy=ny;apply();
+  });
+  vp.addEventListener('pointerup',()=>{
+    st.drag=false;
+    if(st.dist<=8){
+      if(st.pin)onPartner(Number(st.pin.dataset.i));
+      else if(st.poi)onPoi(Number(st.poi.dataset.i));
+    }
+    st.pin=null;st.poi=null;
+  });
+  vp.addEventListener('pointercancel',()=>{st.drag=false;st.pin=null;st.poi=null;});
+  vp._panTo(YOU.x,YOU.y);
+}
+/* search across everything already on the map */
+function searchItems(){
+  return venues.map((v,i)=>({kind:'partner',i,n:v.name,x:v.x,y:v.y}))
+    .concat(pois.map((p,i)=>({kind:'poi',i,n:p.n,x:p.x,y:p.y})))
+    .concat(landmarks.map((l,i)=>({kind:'landmark',li:i,n:l.n,x:l.x,y:l.y,d:l.d})));
+}
+function wireSearch(inputSel,listSel,vp,pick){
+  const input=$(inputSel),list=$(listSel);
+  input.addEventListener('input',()=>{
+    const q=input.value.trim().toLowerCase();
+    if(!q){list.innerHTML='';return;}
+    const hits=searchItems().filter(it=>it.n.toLowerCase().includes(q)).slice(0,5);
+    list.innerHTML=hits.length?hits.map((h,idx)=>`
+      <button class="search-hit" data-idx="${idx}">${h.n}${h.kind==='partner'?'<span class="spons">Partner</span>':''}</button>`).join('')
+      :'<div class="search-empty">No spots by this name on the map yet</div>';
+    list.querySelectorAll('.search-hit').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const h=hits[b.dataset.idx];
+        vp._panTo(h.x,h.y);
+        input.value='';list.innerHTML='';
+        pick(h);
+      });
+    });
+  });
+}
+/* sheet detail + suggest */
+let sheetCtx='dm',curSheetSpot=null;
+function postVenue(v,partner){
+  if(sheetCtx==='server'){
+    const box=$('#svMsgs');
+    box.insertAdjacentHTML('beforeend',
+      `<div class="msg venue-card" style="align-self:flex-end"><b>&#128205; ${v.name}</b>${v.d}${partner?`<br><small>Partner venue &middot; ${v.perk}</small>`:''}</div>`);
+    box.scrollTop=box.scrollHeight;
+    svGroupReact(`${v.name} works! Pinning this for the group`);
+  }else{
+    pushDM({type:'venue',t:v.name,d:v.d,perk:v.perk,partner});
+    themReply(`${v.name} is perfect. See you there Saturday!`);
+  }
+  if(partner)toast('Partner venues pay Haven per check-in. Revenue arrives when people meet.');
+}
+function renderSheetDetail(){
+  if(!curSheetSpot)return;
+  const kind=curSheetSpot.kind,i=curSheetSpot.i;
+  const s=spotInfo(kind,i);
+  const key=kind+'-'+i;
+  const d=$('#venueDetail');
+  d.className='venue-detail open vd-col';
+  d.innerHTML=`
+   ${detailHead(s,savedSpots.has(key))}
+   <div class="vd-stars"><span class="vd-you">Your rating</span>${myStarsHTML(myRatings[key]||0)}</div>
+   <div class="vd-actions"><button class="vd-btn vd-save" id="suggestSpot">Suggest this spot</button></div>`;
+  wireMyStars(d,key,renderSheetDetail);
+  $('#suggestSpot').addEventListener('click',()=>{
+    closeSheet();
+    if(kind==='partner')postVenue(venues[i],true);
+    else postVenue({name:s.name,d:s.sub,perk:''},false);
+  });
+}
+function sheetPartnerDetail(i){curSheetSpot={kind:'partner',i};renderSheetDetail();}
+function sheetPoiDetail(i){curSheetSpot={kind:'poi',i};renderSheetDetail();}
+function sheetPick(h){
+  if(h.kind==='partner')sheetPartnerDetail(h.i);
+  else if(h.kind==='poi')sheetPoiDetail(h.i);
+  else{curSheetSpot={kind:'landmark',i:h.li};renderSheetDetail();}
+}
+function openSheet(ctx){
+  sheetCtx=ctx||'dm';
+  curSheetSpot=null;
+  $('#meetSheet').classList.add('open');$('#scrim').classList.add('open');
+  setupMap($('#mapVp'),sheetPartnerDetail,sheetPoiDetail);
+  $('#venueDetail').className='venue-detail';
+  $('#meetSearch').value='';$('#meetResults').innerHTML='';
+}
+function closeSheet(){$('#meetSheet').classList.remove('open');$('#scrim').classList.remove('open');}
+$('#optMeet').addEventListener('click',()=>{closeAttach();openSheet('dm');});
+$('#svOptMeet').addEventListener('click',()=>{svCloseAttach();openSheet('server');});
+$('#sheetClose').addEventListener('click',closeSheet);
+$('#scrim').addEventListener('click',closeSheet);
+wireSearch('#meetSearch','#meetResults',$('#mapVp'),sheetPick);
+
+/* map tab: solo spots */
+function spotInfo(kind,i){
+  if(kind==='partner'){const v=venues[i];return{icon:v.icon,name:v.name,sub:v.d+' \u00B7 '+v.perk,partner:true,rating:v.rating,votes:v.votes,x:v.x,y:v.y};}
+  if(kind==='poi'){const p=pois[i];return{icon:'&#128205;',name:p.n,sub:'Standard spot on the map',partner:false,rating:p.rating,votes:p.votes,x:p.x,y:p.y};}
+  const l=landmarks[i];return{icon:'&#127807;',name:l.n,sub:l.d,partner:false,rating:l.rating,votes:l.votes,x:l.x,y:l.y};
+}
+let curSpot=null,myRatings={};
+function myStarsHTML(mine){
+  return [1,2,3,4,5].map(n=>`<button class="star my ${n<=mine?'on':''}" data-n="${n}" aria-label="Rate ${n} stars">&#9733;</button>`).join('');
+}
+function detailHead(s,saved){
+  return `<div class="vd-head"><div class="venue-icon">${s.icon}</div>
+    <div class="vd-text"><b>${s.name} ${s.partner?'<span class="spons">Partner</span>':''}${saved?'<span class="saved-tag">Saved</span>':''}</b><small>${s.sub}</small></div>
+    <div class="vd-score"><b>${s.rating.toFixed(1)}</b><small>${s.votes} ratings</small></div></div>`;
+}
+function wireMyStars(container,key,rerender){
+  container.querySelectorAll('.star.my').forEach(b=>{
+    b.addEventListener('click',()=>{
+      myRatings[key]=Number(b.dataset.n);
+      rerender();
+      toast('Rating accepted. Global scores update in the full app.');
+    });
+  });
+}
+function renderTabDetail(){
+  if(!curSpot)return;
+  const s=spotInfo(curSpot.kind,curSpot.i);
+  const key=curSpot.kind+'-'+curSpot.i;
+  const saved=savedSpots.has(key);
+  const d=$('#mapDetail');
+  d.className='venue-detail open vd-col';
+  d.innerHTML=`
+   ${detailHead(s,saved)}
+   <div class="vd-stars"><span class="vd-you">Your rating</span>${myStarsHTML(myRatings[key]||0)}</div>
+   <div class="vd-actions">${saved
+     ?'<button class="vd-btn vd-del" id="delSpot">Delete spot</button>'
+     :'<button class="vd-btn vd-save" id="saveSpot">Save spot</button>'}</div>`;
+  wireMyStars(d,key,renderTabDetail);
+  const sv=$('#saveSpot');
+  if(sv)sv.addEventListener('click',()=>{
+    savedSpots.add(key);
+    refreshTabMap(s);
+    toast('Saved. Green rings mark your spots on the map.');
+  });
+  const dl=$('#delSpot');
+  if(dl)dl.addEventListener('click',()=>{
+    savedSpots.delete(key);
+    refreshTabMap(s);
+    toast('Spot removed from your saved list.');
+  });
+}
+function refreshTabMap(s){
+  setupMap($('#tabMapVp'),tabPartnerDetail,tabPoiDetail);
+  $('#tabMapVp')._panTo(s.x,s.y);
+  renderTabDetail();
+}
+function tabPartnerDetail(i){curSpot={kind:'partner',i};renderTabDetail();}
+function tabPoiDetail(i){curSpot={kind:'poi',i};renderTabDetail();}
+function tabPick(h){
+  if(h.kind==='partner')tabPartnerDetail(h.i);
+  else if(h.kind==='poi')tabPoiDetail(h.i);
+  else{curSpot={kind:'landmark',i:h.li};renderTabDetail();}
+}
+setupMap($('#tabMapVp'),tabPartnerDetail,tabPoiDetail);
+wireSearch('#tabSearch','#tabResults',$('#tabMapVp'),tabPick);
+
+/* ===== CALLS ===== */
+let callTimer=null,callSecs=0;
+function startCall(opts){
+  const av=$('#callAvatars');
+  if(opts.group){
+    av.innerHTML=`<div class="call-grid">${members.map(m=>`<div class="avatar" style="background:${m.c}">${m.n[0]}</div>`).join('')}</div>`;
+    $('#callName').textContent=opts.name;
+    $('#callStatus').textContent=opts.sub+' voice channel';
+  }else{
+    av.innerHTML=`<div class="call-ava-wrap"><div class="ring"></div><div class="ring r2"></div>
+      <div class="avatar" style="background:${opts.color}">${opts.initial}</div></div>`;
+    $('#callName').textContent=opts.name;
+    $('#callStatus').textContent='Connecting\u2026';
+  }
+  $('#muteBtn').classList.remove('active');
+  $('#callView').classList.add('open');
+  callSecs=0;
+  clearInterval(callTimer);
+  callTimer=setInterval(()=>{
+    callSecs++;
+    if(callSecs>=2){
+      const m=String(Math.floor((callSecs-2)/60)).padStart(1,'0');
+      const s=String((callSecs-2)%60).padStart(2,'0');
+      $('#callStatus').textContent=(opts.group?opts.sub+' \u00B7 ':'')+m+':'+s;
+    }
+  },1000);
+}
+function stopCall(){clearInterval(callTimer);callTimer=null;$('#callView').classList.remove('open');}
+$('#dmCall').addEventListener('click',()=>{
+  if(curThread)startCall({name:curThread.name,color:curThread.color,initial:curThread.initial});
+});
+$('#muteBtn').addEventListener('click',function(){this.classList.toggle('active');});
+$('#spkBtn').addEventListener('click',function(){this.classList.toggle('active');});
+$('#endBtn').addEventListener('click',stopCall);
+
+/* ===== YOU: profile ===== */
+$('#myAvatar').addEventListener('click',()=>$('#avaFile').click());
+$('#avaFile').addEventListener('change',function(){
+  const f=this.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    const a=$('#myAvatar');
+    a.style.backgroundImage=`url(${e.target.result})`;
+    a.childNodes[0].textContent='';
+    toast('Profile photo updated');
+  };
+  r.readAsDataURL(f);
+});
+$('#saveBio').addEventListener('click',()=>{
+  toast('Profile saved. Matches see your bio on your card.');
+});
+
+/* ===== YOU: mood chart + check-in ===== */
+let moods=[3.4,3.0,3.6,4.0,3.7,4.2,3.8]; /* 1-5 scale, last = today */
+function drawChart(highlightToday){
+  const W=320,H=110,pad=10;
+  const xs=moods.map((_,i)=>pad+i*(W-2*pad)/(moods.length-1));
+  const ys=moods.map(v=>H-14-((v-1)/4)*(H-32));
+  let d=`M${xs[0]},${ys[0]}`;
+  for(let i=1;i<xs.length;i++){
+    const mx=(xs[i-1]+xs[i])/2;
+    d+=` C${mx},${ys[i-1]} ${mx},${ys[i]} ${xs[i]},${ys[i]}`;
+  }
+  const fill=d+` L${xs[xs.length-1]},${H-5} L${xs[0]},${H-5} Z`;
+  $('#chartWrap').innerHTML=`
+   <svg viewBox="0 0 ${W} ${H}" width="100%" aria-label="Mood chart for the week">
+    <defs><linearGradient id="mf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8E3A5F" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#8E3A5F" stop-opacity="0"/></linearGradient></defs>
+    <path d="${fill}" fill="url(#mf)"/>
+    <path d="${d}" fill="none" stroke="#8E3A5F" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="${xs[xs.length-1]}" cy="${ys[ys.length-1]}" r="${highlightToday?7:5}" fill="#D9A441" stroke="#FFFDF8" stroke-width="2">
+      ${highlightToday?'<animate attributeName="r" values="5;8;6" dur=".7s"/>':''}
+    </circle></svg>`;
+}
+drawChart(false);
+
+const questions=[
+ {q:'How is your mood right now?',opts:['Rough','Low','Okay','Good','Bright']},
+ {q:'How connected did you feel to people today?',opts:['Not at all','A little','Somewhat','Quite a bit','Deeply']},
+ {q:'How did you sleep last night?',opts:['Barely','Poorly','Okay','Well','Great']},
+ {q:'How much energy do you have?',opts:['Empty','Running low','Steady','Charged','Overflowing']},
+ {q:'Did you do something today that felt like you?',opts:['No','Not really','A bit','Yes','Absolutely']},
+];
+let qIdx=0,answers=[];
+$('#startCheckin').addEventListener('click',()=>{qIdx=0;answers=[];renderQuestion();});
+function renderQuestion(){
+  const card=$('#checkinCard');
+  if(qIdx>=questions.length){
+    const avg=answers.reduce((a,b)=>a+b,0)/answers.length;
+    moods[moods.length-1]=Math.round(avg*10)/10;
+    drawChart(true);
+    $('#streakNum').textContent='13';
+    $('#chartSub').textContent='Updated moments ago from today\u2019s check-in.';
+    card.innerHTML=`<div class="checkin-done"><div class="big">&#127807;</div>
+      <h3>Day 13 in the books</h3>
+      <p class="sub" style="margin-top:6px">Today\u2019s point on your chart moved to ${moods[moods.length-1].toFixed(1)} out of 5. Answers stay private and feed the chart, nothing else.</p></div>`;
+    toast('Check-in saved. Your chart updated below.');
+    return;
+  }
+  const q=questions[qIdx];
+  card.innerHTML=`<h3>Daily check-in</h3>
+    <div class="q-progress">${questions.map((_,i)=>`<div class="q-dot ${i<qIdx?'done':''}"></div>`).join('')}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts">${q.opts.map((o,i)=>`<button class="q-opt" data-v="${i+1}">${o}</button>`).join('')}</div>`;
+  card.querySelectorAll('.q-opt').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      btn.classList.add('picked');
+      answers.push(Number(btn.dataset.v));
+      setTimeout(()=>{qIdx++;renderQuestion();},320);
+    });
+  });
+}
+$('#exportBtn').addEventListener('click',()=>toast('In the full app, this builds a PDF you review before sending.'));
+$('#saveJournal').addEventListener('click',()=>{
+  const t=$('#journalText').value.trim();
+  if(!t){toast('Write a line first, then save.');return;}
+  toast('Entry saved to your private journal.');
+});
+$('#accessEntries').addEventListener('click',()=>{
+  toast('Past entries open in the full app, with guided journaling in Haven Plus.');
+});
+$('#plusBtn').addEventListener('click',()=>toast('Plus unlocks in the full app. Core matching and safety stay free.'));
+
+/* ===== TRUST: predator simulation ===== */
+const simScript=[
+ {t:'hey! loved your profile, you seem way more mature than most people on here',flag:null},
+ {t:'this app is kinda glitchy lol, message me on WhatsApp instead? 515-555-0147',flag:'Pattern: rapid push to move off platform'},
+ {t:'btw don\u2019t mention me in the group chat, people there get weird and jealous',flag:'Pattern: secrecy and isolation language'},
+ {t:'this is awkward but my car got towed and i\u2019m short $80, could you spot me? i\u2019ll pay you back friday',flag:'Pattern: early financial request'}
+];
+let simRunning=false;
+$('#simBtn').addEventListener('click',()=>{
+  if(simRunning)return;
+  simRunning=true;
+  const stage=$('#simStage'),box=$('#simMsgs');
+  stage.classList.add('open');box.innerHTML='';
+  $('#simBtn').textContent='Simulation running\u2026';
+  simScript.forEach((m,i)=>{
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='sim-msg';el.textContent=m.t;
+      box.appendChild(el);
+      if(m.flag){
+        setTimeout(()=>{
+          el.classList.add('flagged');
+          el.insertAdjacentHTML('beforeend',`<span class="flag-label">&#9873; ${m.flag}</span>`);
+        },700);
+      }
+    },i*1800);
+  });
+  setTimeout(()=>{
+    box.insertAdjacentHTML('afterend','');
+    $('#simStage').insertAdjacentHTML('beforeend',
+      `<div class="sim-verdict" id="simVerdict"><b>3 patterns flagged in under a minute.</b><br>
+      The thread freezes and routes to a trained human moderator. The flagged account cannot start new matches during review. The person being targeted sees a gentle safety note, never an accusation. A human makes the final call on every flag.</div>`);
+    $('#simBtn').textContent='Replay the simulation';
+    simRunning=false;
+  },simScript.length*1800+1200);
+});
+const simBtnOrig=$('#simBtn');
+simBtnOrig.addEventListener('click',()=>{
+  const v=$('#simVerdict');if(v)v.remove();
+});
+
+/* slow grooming weekly scan */
+const slowScript=[
+ {w:'Week 1',t:'you\u2019re honestly the only person on this app worth talking to'},
+ {w:'Week 1',t:'the group chats are so fake. we get each other though'},
+ {w:'Week 2',t:'did you tell anyone we talk? i\u2019d rather keep this ours'},
+ {w:'Week 3',t:'skip game night this week. those people drain you, i\u2019m all you need'}
+];
+const slowFlags=[null,
+ 'Cumulative: separating you from the community',
+ 'Cumulative: secrecy request',
+ 'Cumulative: isolation, discouraging other connection'];
+let slowRunning=false;
+$('#slowBtn').addEventListener('click',()=>{
+  const v=$('#slowVerdict');if(v)v.remove();
+  if(slowRunning)return;
+  slowRunning=true;
+  const stage=$('#slowStage'),box=$('#slowMsgs');
+  stage.classList.add('open');box.innerHTML='';
+  $('#slowBtn').textContent='Scan running\u2026';
+  const els=[];
+  slowScript.forEach((m,i)=>{
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='sim-msg';
+      el.innerHTML=`<span class="sim-week">${m.w}</span>${esc(m.t)}`;
+      box.appendChild(el);els[i]=el;
+    },i*1100);
+  });
+  setTimeout(()=>{
+    box.insertAdjacentHTML('beforeend',
+      '<div class="sim-week" style="margin-top:6px">Sunday night: the slow detector reads the full thread</div>');
+  },slowScript.length*1100+400);
+  slowFlags.forEach((f,i)=>{
+    if(!f)return;
+    setTimeout(()=>{
+      els[i].classList.add('flagged');
+      els[i].insertAdjacentHTML('beforeend',`<span class="flag-label">&#9873; ${f}</span>`);
+    },slowScript.length*1100+1200+i*800);
+  });
+  setTimeout(()=>{
+    $('#slowStage').insertAdjacentHTML('beforeend',
+      `<div class="sim-verdict" id="slowVerdict"><b>No single message trips the fast filter.</b><br>
+      Read together, three weeks of small asks form an isolation pattern. The slow detector flags the escalation and routes the thread to a trained human moderator for the final call.</div>`);
+    $('#slowBtn').textContent='Replay the slow detector';
+    slowRunning=false;
+  },slowScript.length*1100+1200+slowFlags.length*800+800);
+});
+</script>
+</body>
+</html>
